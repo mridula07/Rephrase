@@ -1,0 +1,208 @@
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.fadeUp {
+  animation: fadeUp 0.35s ease-out;
+}
+
+.fadeUpFast {
+  animation: fadeUp 0.25s ease-out;
+}
+
+.shimmerBar {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 400px 100%;
+  border-radius: 6px;
+  animation: shimmer 1.5s infinite;
+}
+
+.scenarioItem {
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.scenarioItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.scenarioItemMobile {
+  padding: 10px 12px;
+  font-size: 13px;
+  color: #cbd5e1;
+  cursor: pointer;
+}
+.scenarioItemMobile:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.scenarioDropdownList {
+  max-height: 197.5px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) transparent;
+}
+.scenarioDropdownList::-webkit-scrollbar {
+  width: 6px;
+}
+.scenarioDropdownList::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scenarioDropdownList::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+.scenarioDropdownList::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.translateButton {
+  margin-top: 24px;
+  background: #059669;
+  color: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(5, 150, 105, 0.25);
+  transition:
+    transform 0.1s,
+    box-shadow 0.15s;
+  user-select: none;
+  border: none;
+}
+.translateButton:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(5, 150, 105, 0.35);
+}
+.translateButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.2);
+}
+
+.translateButtonMobile {
+  margin-top: 20px;
+  background: #059669;
+  color: #fff;
+  border-radius: 10px;
+  padding: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(5, 150, 105, 0.25);
+  border: none;
+}
+.translateButtonMobile:active {
+  transform: scale(0.98);
+}
+
+.pillButton {
+  padding: 6px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: background 0.15s;
+  border: none;
+}
+.pillButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tonePill {
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  border-width: 1.5px;
+  border-style: solid;
+}
+.tonePill:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.thumbButton {
+  width: 34px;
+  height: 34px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.15s;
+  border: none;
+}
+.thumbUp:hover {
+  background: rgba(5, 150, 105, 0.15);
+}
+.thumbDown:hover {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+.thumbButtonMobile {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  border: none;
+}
+
+.mobileTab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.15s;
+  background: none;
+}
