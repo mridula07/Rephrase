@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rephrase
 
-## Getting Started
+Type it the way you'd say it to a friend. Rephrase turns it into something you can send at work, and tells you why it works.
 
-First, run the development server:
+## Run it locally
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env.local` file in this folder with your keys (never commit it):
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+GEMINI_API_KEY=your-gemini-key
+GROQ_API_KEY=your-groq-key   # optional backup if Gemini is busy
+```
 
-## Learn More
+## How it's built
 
-To learn more about Next.js, take a look at the following resources:
+- `app/api/rephrase/route.ts` — one endpoint. Takes `{ message, scenario?, to, firmness }`, returns `{ message, why }`. Gemini first, Groq as backup.
+- `lib/rephrase-prompt.ts` — the system prompt and per-situation guidance.
+- `lib/options.ts` — situations, recipients, firmness levels (shared by UI and API).
+- `components/rephrase/` — the folder-on-a-desk UI. The desk is a 1440×900 scene scaled to fit the window; below 760px wide the two pages stack.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Credits
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- UI components, icons and the AI sparkle are adapted from the **Paper Wireframe Kit** by Method (Figma Community) — check the kit's licence and keep this credit.
+- Fonts: Patrick Hand and IBM Plex Mono (SIL Open Font License).
+- Desk photos in `public/desk/` are placeholders and must be replaced with licensed or self-shot images before launch.
