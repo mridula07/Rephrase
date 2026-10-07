@@ -3,16 +3,18 @@ import { isGeminiFallbackEligible, rephraseMessage } from "@/lib/gemini";
 import { rephraseWithGroq } from "@/lib/groq";
 import { checkRateLimit, isPayloadTooLarge } from "@/lib/request-guards";
 import {
-  FORMALITY_LABELS,
+  FIRMNESS,
   MAX_MESSAGE_LENGTH,
+  RECIPIENTS,
   SCENARIOS,
-  type FormalityLabel,
+  type Firmness,
+  type Recipient,
   type Scenario,
-} from "@/components/rephrase/translations";
+} from "@/lib/options";
 
 function genericErrorResponse() {
   return NextResponse.json(
-    { error: "We couldn't generate a rewrite right now. Please try again." },
+    { error: "Couldn't write that one. Try again in a moment." },
     { status: 502 }
   );
 }
@@ -55,11 +57,11 @@ export async function POST(request: Request) {
     );
   }
 
-  const { message, scenario, formality } = body as Record<string, unknown>;
+  const { message, scenario, to, firmness } = body as Record<string, unknown>;
 
   if (typeof message !== "string" || !message.trim()) {
     return NextResponse.json(
-      { error: "Message is required." },
+      { error: "Write something first." },
       { status: 400 }
     );
   }
@@ -67,44 +69,44 @@ export async function POST(request: Request) {
   if (message.trim().length > MAX_MESSAGE_LENGTH) {
     return NextResponse.json(
       {
-        error: `Message is too long. Please limit it to ${MAX_MESSAGE_LENGTH} characters.`,
+        error: `That's a bit long. Keep it under ${MAX_MESSAGE_LENGTH} characters.`,
       },
       { status: 400 }
     );
   }
 
+  // Scenario is optional: null/undefined means "work it out from the message".
   if (
-    typeof scenario !== "string" ||
-    !SCENARIOS.includes(scenario as Scenario)
+    scenario != null &&
+    (typeof scenario !== "string" || !SCENARIOS.includes(scenario as Scenario))
   ) {
-    return NextResponse.json(
-      { error: "Invalid scenario." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid scenario." }, { status: 400 });
+  }
+
+  if (typeof to !== "string" || !RECIPIENTS.includes(to as Recipient)) {
+    return NextResponse.json({ error: "Invalid recipient." }, { status: 400 });
   }
 
   if (
-    typeof formality !== "string" ||
-    !FORMALITY_LABELS.includes(formality as FormalityLabel)
+    typeof firmness !== "string" ||
+    !FIRMNESS.includes(firmness as Firmness)
   ) {
-    return NextResponse.json(
-      { error: "Invalid formality level." },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Invalid firmness." }, { status: 400 });
   }
 
   const input = {
     message: message.trim(),
-    scenario: scenario as Scenario,
-    formality: formality as FormalityLabel,
+    scenario: (scenario ?? null) as Scenario | null,
+    to: to as Recipient,
+    firmness: firmness as Firmness,
   };
 
   try {
-    const text = await rephraseMessage(input);
+    const result = await rephraseMessage(input);
     if (process.env.NODE_ENV !== "production") {
       console.log("[Rephrase] Provider: Gemini");
     }
-    return NextResponse.json({ text });
+    return NextResponse.json(result);
   } catch (geminiError) {
     console.error("Gemini rephrase failed:", geminiError);
 
@@ -113,11 +115,11 @@ export async function POST(request: Request) {
     }
 
     try {
-      const text = await rephraseWithGroq(input);
+      const result = await rephraseWithGroq(input);
       if (process.env.NODE_ENV !== "production") {
         console.log("[Rephrase] Gemini unavailable → Provider: Groq");
       }
-      return NextResponse.json({ text });
+      return NextResponse.json(result);
     } catch (groqError) {
       console.error("Groq rephrase failed:", groqError);
       return genericErrorResponse();
