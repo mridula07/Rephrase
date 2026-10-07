@@ -7,8 +7,8 @@
 
 .viewport {
   position: relative;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
   overflow: hidden;
   background-color: var(--desk);
 }
@@ -643,6 +643,9 @@
 }
 .mFolder {
   position: relative;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
   margin-top: 30px;
   padding: 12px 10px 14px;
   border-radius: 0 12px 12px 12px;

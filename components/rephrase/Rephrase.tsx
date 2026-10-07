@@ -18,23 +18,41 @@ import styles from "./Rephrase.module.css";
 
 const STAGE_W = 1440;
 const STAGE_H = 900;
-const MOBILE_BREAKPOINT = 760;
+// The folder needs ~1100×840 of the scene to read well. Below 900px wide
+// (tablets in portrait, phones) the pages stack in one column instead.
+const FIT_W = 1100;
+const FIT_H = 840;
+const STACK_BREAKPOINT = 900;
+const MIN_SCALE = 0.8; // never shrink the text below ~11px
+const MAX_SCALE = 1.35;
 const FALLBACK_ERROR = "Couldn't write that one. Try again in a moment.";
 
 type Status = "idle" | "loading" | "done" | "error";
 
+interface StageState {
+  stacked: boolean;
+  scale: number;
+  height: number; // px the scene needs; taller than the window only on very short screens
+}
+
 // The desk is designed as a 1440×900 scene (same as the Figma frame) and
-// scaled to fit the window, so the composition never breaks. Below the
-// mobile breakpoint the pages stack instead.
+// scaled to fit the window, so the composition never breaks.
 function useStage() {
-  const [state, setState] = useState<{ scale: number; mobile: boolean } | null>(null);
+  const [state, setState] = useState<StageState | null>(null);
   useLayoutEffect(() => {
     const update = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
+      // Show the whole desk when there's room (1440×900 renders at exactly
+      // 1:1 like the Figma frame). On smaller laptops, zoom in on the folder
+      // and let the desk objects run off the edges rather than shrink the text.
+      const wholeDesk = Math.min(w / STAGE_W, h / STAGE_H);
+      const folderOnly = Math.min(w / FIT_W, h / FIT_H, 0.92);
+      const scale = Math.min(Math.max(wholeDesk, folderOnly, MIN_SCALE), MAX_SCALE);
       setState({
-        mobile: w < MOBILE_BREAKPOINT,
-        scale: Math.min(w / STAGE_W, h / STAGE_H, 1.35),
+        stacked: w < STACK_BREAKPOINT,
+        scale,
+        height: Math.max(h, Math.round(FIT_H * scale)),
       });
     };
     update();
@@ -96,7 +114,7 @@ export default function Rephrase() {
       setResult({ message: data.message, why: typeof data.why === "string" ? data.why : "" });
       setResultKey(key);
       setStatus("done");
-      if (stage?.mobile) {
+      if (stage?.stacked) {
         requestAnimationFrame(() =>
           resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
         );
@@ -270,7 +288,7 @@ export default function Rephrase() {
           aria-busy={loading}
           disabled={loading}
         >
-          {loading ? "Translating" : "Translate"}
+          {loading ? "Translating…" : "Translate"}
           <SparkleIcon size={20} className={loading ? styles.sparkleBusy : undefined} />
         </button>
       </div>
@@ -338,7 +356,7 @@ export default function Rephrase() {
 
   if (!stage) return <main className={styles.boot} />;
 
-  if (stage.mobile) {
+  if (stage.stacked) {
     return (
       <main className={styles.mobile}>
         <div className={styles.mFolder}>
@@ -355,10 +373,13 @@ export default function Rephrase() {
   }
 
   return (
-    <main className={styles.viewport}>
+    <main className={styles.viewport} style={{ height: stage.height }}>
       <div
         className={styles.stage}
-        style={{ transform: `translate(-50%, -50%) scale(${stage.scale})` }}
+        style={{
+          transform: `translate(-50%, -50%) scale(${stage.scale})`,
+          top: stage.height / 2 + ((STAGE_H / 2 - 455) * stage.scale),
+        }}
       >
         {/* desk objects — decorative, fixed size inside the scaled scene */}
         {/* eslint-disable @next/next/no-img-element */}
